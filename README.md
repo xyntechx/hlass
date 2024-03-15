@@ -2,9 +2,13 @@
 One-stop curriculum resource for Haas undergraduate students
 
 ## 📚 Commands
-Run locally
+Install dependencies
 ```bash
 pnpm i
+```
+
+Run locally
+```bash
 pnpm dev
 ```
 

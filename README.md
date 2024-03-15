@@ -20,6 +20,8 @@ pnpm build
 ## 🚀 Deployment
 We're currently using Vercel to host our website. Every time a new commit is added to `main`, a new build is deployed in Vercel.
 
+URL: https://hlass.vercel.app/
+
 ## 💻 Contribution Guidelines
 - Don't directly push to `main`; always create a new branch and make a PR before merging to `main`
 - Try your best to make your code as bug free as possible before making a PR

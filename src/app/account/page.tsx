@@ -2,6 +2,8 @@
 
 import useSession from "@/lib/supabase/use-session";
 
+// ? Reference component; currently not used
+
 export default function Account() {
     const user = useSession()?.user;
 
@@ -13,7 +15,7 @@ export default function Account() {
                     <p>{`email: ${user?.email}`}</p>
                 </>
             ) : (
-                <p>Loading ...</p>
+                <p>No user found</p>
             )}
         </>
     );

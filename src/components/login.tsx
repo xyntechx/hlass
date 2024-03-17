@@ -2,6 +2,8 @@
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 
+// ? Reference component; currently not used
+
 export default function LoginButton() {
     const supabase = createSupabaseBrowserClient();
 

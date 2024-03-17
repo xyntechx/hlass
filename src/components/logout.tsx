@@ -3,6 +3,8 @@
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import { useRouter } from "next/navigation";
 
+// ? Reference component; currently not used
+
 export default function LogoutButton() {
     const supabase = createSupabaseBrowserClient();
     const router = useRouter();

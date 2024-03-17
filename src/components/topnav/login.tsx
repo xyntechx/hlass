@@ -1,18 +1,17 @@
 "use client";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
+import { useRouter } from "next/navigation";
 
-export default function LoginButton(props: { nextUrl?: string }) {
+export default function LoginButton() {
     const supabase = createSupabaseBrowserClient();
 
     const handleLogin = async () => {
         await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: `${location.origin}/auth/callback?next=${
-                    props.nextUrl || ""
-                }`,
-            },
+                redirectTo: `${location.origin}/account`
+            }
         });
     };
 

@@ -10,26 +10,26 @@ const Topnav = () => {
     const user = useSession()?.user;
 
     return (
-        <nav className="flex w-screen items-center justify-between p-4">
+        <nav className="flex w-screen items-center justify-between px-4 py-2 ">
             {/* // TODO: Insert logo */}
             <Link href="/">Hlass Logo</Link>
 
             <div className="flex items-center justify-center gap-x-8">
                 <Link
                     href="/reviews"
-                    className="rounded-lg border-2 border-light-blue px-2 py-1 transition-colors hover:border-primary-blue"
+                    className="border-b-2 border-b-transparent px-2 py-1 transition-all hover:border-b-primary-blue hover:text-primary-blue"
                 >
                     Class Reviews
                 </Link>
                 <Link
                     href="/maps"
-                    className="rounded-lg border-2 border-light-blue px-2 py-1 transition-colors hover:border-primary-blue"
+                    className="border-b-2 border-b-transparent px-2 py-1 transition-all hover:border-b-primary-blue hover:text-primary-blue"
                 >
                     Curriculum Maps
                 </Link>
                 <Link
                     href="/guide"
-                    className="rounded-lg border-2 border-light-blue px-2 py-1 transition-colors hover:border-primary-blue"
+                    className="border-b-2 border-b-transparent px-2 py-1 transition-all hover:border-b-primary-blue hover:text-primary-blue"
                 >
                     Enrollment Guide
                 </Link>

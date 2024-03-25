@@ -17,7 +17,7 @@ export default function Login() {
     return (
         <button
             onClick={handleLogin}
-            className="w-[100px] rounded-lg border-2 border-primary-blue bg-primary-blue py-1 text-white transition-shadow hover:shadow-lg"
+            className="rounded-full border-2 border-primary-blue bg-primary-blue px-4 py-1 text-white transition-shadow hover:shadow-lg"
         >
             Login
         </button>

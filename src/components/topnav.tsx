@@ -4,7 +4,6 @@ import Link from "next/link";
 import useSession from "@/lib/supabase/use-session";
 import Login from "./buttons/login";
 import Account from "./buttons/account";
-import Logout from "./buttons/logout";
 
 const Topnav = () => {
     const user = useSession()?.user;

@@ -3,9 +3,7 @@
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import { useRouter } from "next/navigation";
 
-// ? Reference component; currently not used
-
-export default function LogoutButton() {
+export default function Logout() {
     const supabase = createSupabaseBrowserClient();
     const router = useRouter();
 
@@ -14,5 +12,12 @@ export default function LogoutButton() {
         router.refresh();
     };
 
-    return <button onClick={handleLogout}>Logout</button>;
+    return (
+        <button
+            onClick={handleLogout}
+            className="rounded-full border-2 border-red-500 bg-red-500 px-4 py-1 text-white transition-shadow hover:shadow-lg"
+        >
+            Logout
+        </button>
+    );
 }

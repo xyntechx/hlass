@@ -188,7 +188,7 @@ const ReviewForm = () => {
     return (
         <>
             {/* Header & Selection*/}
-            <section className="h-128 container mx-auto max-w-full p-10 md:max-w-2xl lg:max-w-3xl xl:max-w-5xl">
+            <section className="min-h-screen container mx-auto max-w-full p-10 md:max-w-2xl lg:max-w-3xl xl:max-w-5xl">
                 <h1 className="p-10 text-center text-5xl font-bold">
                     Submit a Review
                 </h1>

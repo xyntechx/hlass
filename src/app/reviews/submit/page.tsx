@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Rating from "react-stars";
 import Select, { SingleValue } from "react-select";
@@ -13,6 +13,7 @@ import {
     attendanceOptions,
     ratingHelpText,
 } from "@/lib/options";
+import Alert from "@/components/alert";
 
 type OptionType = {
     value: string;
@@ -36,6 +37,10 @@ const ReviewForm = () => {
     const [professorOptions, setProfessorOptions] = useState<OptionType[]>([]);
     const [selectedProfessor, setSelectedProfessor] =
         useState<OptionType | null>(null);
+    const [alertType, setAlertType] = useState<"success" | "error" | "info">(
+        "info",
+    );
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchClasses = async () => {
@@ -172,21 +177,38 @@ const ReviewForm = () => {
 
     async function handleSubmit() {
         if (!user) {
-            alert("You must log in to submit a review.");
+            setAlertMessage("You must log in to submit a review.");
+            setAlertType("error");
             return;
         }
+
         const reviewData = consolidateData();
-        try {
-            const { error } = await supabase.from("reviews").insert(reviewData);
-            if (error) throw error;
-            router.push("/reviews/thank-you");
-        } catch (error) {
-            alert("Failed to submit review.");
+
+        const { error } = await supabase.from("reviews").insert(reviewData);
+
+        if (error) {
+            setAlertMessage("Failed to submit review.");
+            setAlertType("error");
+            return;
         }
+
+        router.push("/reviews/thank-you");
     }
+
+    const handleAlertClose = () => {
+        setAlertMessage(null);
+    };
 
     return (
         <div className="flex min-h-screen w-full flex-col items-center justify-center gap-y-10 px-4 pb-20 md:w-1/2">
+            {alertMessage !== null && (
+                <Alert
+                    message={alertMessage}
+                    type={alertType}
+                    close={() => handleAlertClose()}
+                />
+            )}
+
             {/* Header & Selection*/}
             <section className="flex h-fit w-full flex-col items-center justify-start">
                 <h1 className="p-10 text-center text-4xl font-bold">
@@ -444,7 +466,7 @@ const ReviewForm = () => {
             {/* Submit Button */}
             <button
                 onClick={handleSubmit}
-                className="rounded-full border-2 border-primary-blue bg-primary-blue px-10 py-2 text-white transition-shadow hover:shadow-lg"
+                className="rounded-full border-primary-blue bg-primary-blue px-10 py-2 text-white transition-shadow hover:shadow-lg"
             >
                 Submit
             </button>

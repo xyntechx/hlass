@@ -1,5 +1,6 @@
 "use client";
 
+import Logout from "@/components/buttons/logout";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import useSession from "@/lib/supabase/use-session";
 import { useEffect, useState } from "react";
@@ -96,6 +97,8 @@ export default function Account() {
                         LOREM IPSUM REVIEW
                     </div>
                 </div>
+
+                <Logout />
             </section>
         );
     } else {

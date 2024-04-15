@@ -1,5 +1,6 @@
 "use client";
 
+import Logout from "@/components/buttons/logout";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import useSession from "@/lib/supabase/use-session";
 import { useEffect, useState } from "react";
@@ -35,21 +36,21 @@ export default function Account() {
     if (user) {
         return (
             <section className="flex min-h-screen w-full flex-col items-center justify-start">
-                <h1 className="p-10 text-center text-5xl font-bold">
+                <h1 className="p-10 text-center text-4xl font-bold">
                     My Account
                 </h1>
 
                 <div className="flex w-full flex-col items-center justify-center gap-y-2 px-4 md:w-1/2">
                     <div className="flex w-full flex-row items-center justify-start">
-                        <p className="text-dim w-[200px]">Full Name</p>
+                        <p className="w-[200px] text-dim">Full Name</p>
                         <p>{user?.user_metadata?.full_name}</p>
                     </div>
                     <div className="flex w-full flex-row items-center justify-start">
-                        <p className="text-dim w-[200px]">Berkeley Email</p>
+                        <p className="w-[200px] text-dim">Berkeley Email</p>
                         <p>{user?.email}</p>
                     </div>
                     <div className="flex w-full flex-row items-center justify-start">
-                        <p className="text-dim w-[200px]">Graduation Year</p>
+                        <p className="w-[200px] text-dim">Graduation Year</p>
                         <input
                             type="text"
                             value={gradYear}
@@ -96,6 +97,8 @@ export default function Account() {
                         LOREM IPSUM REVIEW
                     </div>
                 </div>
+
+                <Logout />
             </section>
         );
     } else {

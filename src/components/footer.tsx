@@ -4,9 +4,11 @@ import Link from "next/link";
 const Footer = () => {
     return (
         <footer className="flex w-screen flex-col items-center justify-end gap-y-10 px-4 pt-10">
-            <nav className="flex w-full flex-row items-start justify-center gap-x-[200px]">
+            <nav className="flex w-full flex-col items-center justify-center gap-x-[200px] gap-y-10 md:flex-row md:items-start">
                 <div className="flex flex-col items-center justify-center gap-y-1">
-                    <p className="w-full text-left font-bold">CREATED BY</p>
+                    <p className="w-full text-center font-bold md:text-left">
+                        CREATED BY
+                    </p>
                     <Image
                         src="/hbsa.png"
                         alt="HBSA Logo"
@@ -16,14 +18,18 @@ const Footer = () => {
                 </div>
 
                 <div className="flex flex-col items-center justify-center gap-y-1">
-                    <p className="w-full text-left font-bold">RESOURCES</p>
+                    <p className="w-full text-center font-bold md:text-left">
+                        RESOURCES
+                    </p>
                     <FooterLink url="/reviews" text="Class Reviews" />
                     <FooterLink url="/maps" text="Curriculum Maps" />
                     <FooterLink url="/guide" text="Enrollment Guide" />
                 </div>
 
                 <div className="flex flex-col items-center justify-center gap-y-1">
-                    <p className="w-full text-left font-bold">CONTACT</p>
+                    <p className="w-full text-center font-bold md:text-left">
+                        CONTACT
+                    </p>
                     <FooterLink url="/about" text="About Us" />
                     {/* // TODO: Email??? */}
                     <FooterLink url="mailto:" text="Email" />
@@ -34,7 +40,7 @@ const Footer = () => {
                 </div>
             </nav>
 
-            <div className=" bg-gradient-blue-yellow h-[10px] w-screen"></div>
+            <div className=" h-[10px] w-screen bg-gradient-blue-yellow"></div>
         </footer>
     );
 };
@@ -43,7 +49,10 @@ export default Footer;
 
 const FooterLink = ({ url, text }: { url: string; text: string }) => {
     return (
-        <Link href={url} className="w-full text-left hover:text-primary-blue">
+        <Link
+            href={url}
+            className="w-full text-center hover:text-primary-blue md:text-left"
+        >
             {text}
         </Link>
     );

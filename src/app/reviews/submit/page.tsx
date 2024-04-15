@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Rating from "react-stars";
 import Select, { SingleValue } from "react-select";
@@ -13,6 +13,7 @@ import {
     attendanceOptions,
     ratingHelpText,
 } from "@/lib/options";
+import Alert from "@/components/alert";
 
 type OptionType = {
     value: string;
@@ -36,6 +37,10 @@ const ReviewForm = () => {
     const [professorOptions, setProfessorOptions] = useState<OptionType[]>([]);
     const [selectedProfessor, setSelectedProfessor] =
         useState<OptionType | null>(null);
+    const [alertType, setAlertType] = useState<"success" | "error" | "info">(
+        "info",
+    );
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchClasses = async () => {
@@ -172,84 +177,98 @@ const ReviewForm = () => {
 
     async function handleSubmit() {
         if (!user) {
-            alert("You must log in to submit a review.");
+            setAlertMessage("You must log in to submit a review.");
+            setAlertType("error");
             return;
         }
+
         const reviewData = consolidateData();
-        try {
-            const { error } = await supabase.from("reviews").insert(reviewData);
-            if (error) throw error;
-            router.push("/reviews/thank-you");
-        } catch (error) {
-            alert("Failed to submit review.");
+
+        const { error } = await supabase.from("reviews").insert(reviewData);
+
+        if (error) {
+            setAlertMessage("Failed to submit review.");
+            setAlertType("error");
+            return;
         }
+
+        router.push("/reviews/thank-you");
     }
 
+    const handleAlertClose = () => {
+        setAlertMessage(null);
+    };
+
     return (
-        <>
+        <div className="flex min-h-screen w-full flex-col items-center justify-center gap-y-10 px-4 pb-20 md:w-1/2">
+            {alertMessage !== null && (
+                <Alert
+                    message={alertMessage}
+                    type={alertType}
+                    close={() => handleAlertClose()}
+                />
+            )}
+
             {/* Header & Selection*/}
-            <section className="min-h-screen container mx-auto max-w-full p-10 md:max-w-2xl lg:max-w-3xl xl:max-w-5xl">
-                <h1 className="p-10 text-center text-5xl font-bold">
-                    Submit a Review
+            <section className="flex h-fit w-full flex-col items-center justify-start">
+                <h1 className="p-10 text-center text-4xl font-bold">
+                    Submit Review
                 </h1>
-                <div className="p flex justify-between">
-                    <div className="flex w-1/3 flex-col p-4">
-                        <Select
-                            options={classOptions}
-                            onChange={handleClassChange}
-                            value={selectedClass}
-                            placeholder="Choose a Class"
-                            styles={{
-                                control: (provided) => ({
-                                    ...provided,
-                                    fontSize: "1.25rem", // Bigger text size
-                                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Drop shadow
-                                }),
-                            }}
-                        />
-                    </div>
-                    <div className="flex w-1/3 flex-col p-4">
-                        <Select
-                            options={semesters}
-                            onChange={handleSemesterChange}
-                            value={selectedSemester}
-                            placeholder="Select Semester"
-                            styles={{
-                                control: (provided) => ({
-                                    ...provided,
-                                    fontSize: "1.25rem", // Bigger text size
-                                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Drop shadow
-                                }),
-                            }}
-                        />
-                    </div>
-                    <div className="flex w-1/3 flex-col p-4">
-                        <Select
-                            options={professorOptions}
-                            onChange={handleProfessorChange}
-                            value={selectedProfessor}
-                            placeholder="Select Professor"
-                            styles={{
-                                control: (provided) => ({
-                                    ...provided,
-                                    fontSize: "1.25rem", // Bigger text size
-                                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Drop shadow
-                                }),
-                            }}
-                        />
-                    </div>
+                <div className="flex w-full flex-col items-center justify-between gap-y-4">
+                    <Select
+                        options={classOptions}
+                        onChange={handleClassChange}
+                        value={selectedClass}
+                        placeholder="Choose a Class"
+                        className="w-full"
+                        styles={{
+                            control: (provided) => ({
+                                ...provided,
+                                borderRadius: "0.5rem",
+                                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Drop shadow
+                            }),
+                        }}
+                    />
+                    <Select
+                        options={semesters}
+                        onChange={handleSemesterChange}
+                        value={selectedSemester}
+                        placeholder="Select Semester"
+                        className="w-full"
+                        styles={{
+                            control: (provided) => ({
+                                ...provided,
+                                borderRadius: "0.5rem",
+                                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Drop shadow
+                            }),
+                        }}
+                    />
+                    <Select
+                        options={professorOptions}
+                        onChange={handleProfessorChange}
+                        value={selectedProfessor}
+                        placeholder="Select Professor"
+                        className="w-full"
+                        styles={{
+                            control: (provided) => ({
+                                ...provided,
+                                borderRadius: "0.5rem",
+                                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Drop shadow
+                            }),
+                        }}
+                    />
                 </div>
             </section>
 
             {/* Rating Card */}
-            <section className="h-128 container mx-auto max-w-full p-10 md:max-w-2xl lg:max-w-3xl xl:max-w-5xl">
+            <section className="flex h-fit w-full flex-col items-center justify-start gap-y-4">
                 {/* Map through each rating type (overall, difficulty, etc.) and render Rating components */}
-                <h1 className="pb-4 text-4xl font-bold">Rating</h1>
-                <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
+                <h1 className="w-full text-left text-xl font-bold">Rating</h1>
+                <div className="w-full rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
                     {Object.entries(ratings).map(([key, value]) => (
                         <div key={key}>
                             <div className="flex flex-row items-center justify-stretch">
-                                <label className="w-1/4 self-start pl-4 pt-4 text-xl font-bold">
+                                <label className="w-1/4 self-start pl-4 pt-4 text-lg font-bold">
                                     {key.charAt(0).toUpperCase() + key.slice(1)}
                                 </label>
                                 <div className="w-1/2 flex-col items-center">
@@ -263,7 +282,7 @@ const ReviewForm = () => {
                                                     newValue,
                                                 )
                                             }
-                                            size={60}
+                                            size={40}
                                         />
                                     </div>
                                     <div className="text-s flex w-full justify-around pb-2 md:text-sm">
@@ -295,12 +314,14 @@ const ReviewForm = () => {
             </section>
 
             {/* Class Info Card */}
-            <section className="h-128 container mx-auto max-w-full p-10 md:max-w-2xl lg:max-w-3xl xl:max-w-5xl">
-                <h1 className="pb-4 text-4xl font-bold">Class Info</h1>
-                <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
+            <section className="flex h-fit w-full flex-col items-center justify-start gap-y-4">
+                <h1 className="w-full text-left text-xl font-bold">
+                    Class Info
+                </h1>
+                <div className="w-full rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
                     {/* Workload Dropdown */}
-                    <div className="flex flex-row items-center justify-between pb-12 pt-10">
-                        <label className="pl-4 text-xl font-bold">
+                    <div className="flex flex-row items-center justify-between py-4">
+                        <label className="pl-4 text-lg font-bold">
                             Workload
                         </label>
                         <Select
@@ -320,8 +341,8 @@ const ReviewForm = () => {
                     <div className="h-0.5 w-full bg-black"></div>
 
                     {/* Number of Exams Dropdown */}
-                    <div className="flex flex-row items-center justify-between pb-12 pt-12">
-                        <label className="pl-4 text-xl font-bold">
+                    <div className="flex flex-row items-center justify-between py-4">
+                        <label className="pl-4 text-lg font-bold">
                             Number of Exams
                         </label>
                         <Select
@@ -341,8 +362,8 @@ const ReviewForm = () => {
                     <div className="h-0.5 w-full bg-black"></div>
 
                     {/* Exam Format Dropdown */}
-                    <div className="flex flex-row items-center justify-between pb-12 pt-12">
-                        <label className="pl-4 text-xl font-bold">
+                    <div className="flex flex-row items-center justify-between py-4">
+                        <label className="pl-4 text-lg font-bold">
                             Exam Format
                         </label>
                         <Select
@@ -363,8 +384,8 @@ const ReviewForm = () => {
                     <div className="h-0.5 w-full bg-black"></div>
 
                     {/* Attendance Policy Dropdown */}
-                    <div className="flex flex-row items-center justify-between pb-10 pt-12">
-                        <label className="pl-4 text-xl font-bold">
+                    <div className="flex flex-row items-center justify-between py-4">
+                        <label className="pl-4 text-lg font-bold">
                             Attendance Policy
                         </label>
                         <Select
@@ -386,32 +407,32 @@ const ReviewForm = () => {
             </section>
 
             {/* Pros & Cons Section */}
-            <section className="h-128 container mx-auto max-w-full p-10 md:max-w-2xl lg:max-w-3xl xl:max-w-5xl">
-                <h1 className="pb-4 text-left text-4xl font-bold">
+            <section className="flex h-fit w-full flex-col items-center justify-start gap-y-4">
+                <h1 className="w-full text-left text-xl font-bold">
                     Pros and Cons
                 </h1>
-                <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
+                <div className="w-full rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
                     {/* Pros Text Area */}
-                    <label className="text-2l pb-8 font-bold">Pros</label>
+                    <label className="text-lg font-bold">Pros</label>
                     <textarea
                         value={prosCons.pros}
                         onChange={(e) =>
                             handleProsConsChange("pros", e.target.value)
                         }
-                        className="h-32 w-full rounded-md border border-gray-500 bg-white px-4 py-2 text-gray-700 hover:border-gray-700"
+                        className="h-32 w-full rounded-lg border border-gray-500 bg-white px-4 py-2 text-gray-700 hover:border-gray-700"
                         rows={4}
                         placeholder="What did you like about the class?"
                     ></textarea>
                     <div className="p-4"></div>
 
                     {/* Cons Text Area */}
-                    <label className="text-2l pb-8 font-bold">Cons</label>
+                    <label className="text-lg font-bold">Cons</label>
                     <textarea
                         value={prosCons.cons}
                         onChange={(e) =>
                             handleProsConsChange("cons", e.target.value)
                         }
-                        className="h-32 w-full rounded-md border border-gray-500 bg-white px-4 py-2 text-gray-700 hover:border-gray-700"
+                        className="h-32 w-full rounded-lg border border-gray-500 bg-white px-4 py-2 text-gray-700 hover:border-gray-700"
                         rows={4}
                         placeholder="What could be improved?"
                     ></textarea>
@@ -419,14 +440,14 @@ const ReviewForm = () => {
             </section>
 
             {/* Additional Comments Section */}
-            <section className="h-128 container mx-auto max-w-full p-10 md:max-w-2xl lg:max-w-3xl xl:max-w-5xl">
-                <h1 className="pb-4 text-left text-4xl font-bold">
+            <section className="flex h-fit w-full flex-col items-center justify-start gap-y-4">
+                <h1 className="w-full text-left text-xl font-bold">
                     Additional Comments
                 </h1>
-                <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
+                <div className="w-full rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
                     {/* Additional Comments Text Area */}
                     <div>
-                        <label className="text-2l pb-8 font-bold">
+                        <label className="text-lg font-bold">
                             Overall Experience
                         </label>
                         <textarea
@@ -434,7 +455,7 @@ const ReviewForm = () => {
                             onChange={(e) =>
                                 setAdditionalComments(e.target.value)
                             }
-                            className="h-32 w-full rounded-md border border-gray-500 bg-white px-4 py-2 text-gray-700 hover:border-gray-700"
+                            className="h-32 w-full rounded-lg border border-gray-500 bg-white px-4 py-2 text-gray-700 hover:border-gray-700"
                             rows={4}
                             placeholder="Any additional thoughts or comments on the class?"
                         ></textarea>
@@ -445,12 +466,11 @@ const ReviewForm = () => {
             {/* Submit Button */}
             <button
                 onClick={handleSubmit}
-                className="rounded-full border-2 border-primary-blue bg-primary-blue px-10 py-2 text-white transition-shadow hover:shadow-lg"
+                className="rounded-full border-primary-blue bg-primary-blue px-10 py-2 text-white transition-shadow hover:shadow-lg"
             >
                 Submit
             </button>
-            <div className="pb-10"></div>
-        </>
+        </div>
     );
 };
 

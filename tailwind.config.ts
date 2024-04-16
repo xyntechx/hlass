@@ -12,6 +12,7 @@ const config: Config = {
                 "primary-blue": "hsl(209, 100%, 20%)",
                 "secondary-blue": "hsl(209, 100%, 70%)",
                 "primary-yellow": "hsl(58, 100%, 70%)",
+                dim: "hsl(0, 0%, 0%, 50%)",
             },
             backgroundImage: {
                 "gradient-green-blue":

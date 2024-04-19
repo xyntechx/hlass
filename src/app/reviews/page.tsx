@@ -12,6 +12,7 @@ import {
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser-client';
 import { useFetchClasses } from '@/lib/supabase/fetch-classes';
 import SortButton from '@/components/buttons/sort';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface Rating {
     name: string;
@@ -44,6 +45,9 @@ const ClassReviewPage = () => {
     const [selectedPrerequisites, setSelectedPrerequisites] = useState<MultiValue<OptionType>>([]);
     const [selectedUnits, setSelectedUnits] = useState<MultiValue<OptionType>>([]);
     const [selectedClassLevel, setSelectedClassLevel] = useState<MultiValue<OptionType>>([]);
+    const [classCount, setClassCount] = useState(0);
+    const [pageIndex, setPageIndex] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
 
     const handlePrerequisitesChange = (newValue: MultiValue<OptionType>) => {
         setSelectedPrerequisites(newValue || []);
@@ -74,11 +78,12 @@ const ClassReviewPage = () => {
         setSelectedClassLevel([]);
     };
 
-    const fetchClasses = useCallback(async () => {
+    const fetchClasses = useCallback(async (index: number) => {
 
         let query = supabase
             .from('classes')
-            .select('*')
+            .select('*', { count: 'exact'})
+            .range(index * 10, (index + 1) * 10 - 1);
 
         if (searchQuery) {
             query = query.ilike('class_name', `%${searchQuery}%`);
@@ -99,7 +104,11 @@ const ClassReviewPage = () => {
             query = query.in('class_level', classLevelValues);
         }
 
-        const { data, error } = await query;
+        const { data, count, error } = await query;
+
+        if (count) {
+            setClassCount(count);
+        }
 
         if (error) {
             console.error('Error fetching data:', error);
@@ -121,13 +130,30 @@ const ClassReviewPage = () => {
             ]
         }));
 
-        setClassReviews(transformedData);
+        if (index === 0) {
+            setClassReviews(transformedData);
+        } else {
+            setClassReviews(prev => [...prev, ...transformedData]);
+        }
+        setPageIndex(index);
+        setHasMore(data.length === 10);
         
     }, [searchQuery, selectedClassLevel, selectedPrerequisites, selectedUnits]);
 
+    const resetAndFetchClasses = useCallback(() => {
+        setPageIndex(0);
+        setClassReviews([]);
+        fetchClasses(0);
+    }, [fetchClasses]);
+
+    const fetchMoreClasses = useCallback(() => {
+        const newIndex = pageIndex + 1;
+        fetchClasses(newIndex);
+    }, [fetchClasses, pageIndex]);
+
     useEffect(() => {
-        fetchClasses();
-    }, [fetchClasses]); 
+        resetAndFetchClasses(); 
+    }, [resetAndFetchClasses]);
 
     useEffect(() => {
         if (!sortBy) return;
@@ -213,7 +239,7 @@ const ClassReviewPage = () => {
 
             <div className="w-2/3 ml-1/3"> {/* Review Cards Container */}
                 <div className="flex justify-between items-center pl-4 max-w-3xl">
-                    <span>{classReviews.length} Results</span>
+                    <span>{classCount} Results</span>
                     <div className='flex flex-row gap-x-2'>
                         <SortButton 
                             sortOrder={sortOrder} 
@@ -226,16 +252,23 @@ const ClassReviewPage = () => {
                         />
                     </div>
                 </div>
-                {classReviews.map(classReview => (
-                    <div key={classReview.id} className="p-4">
-                        <ClassCard
-                            id={classReview.id}
-                            className={classReview.class_name}
-                            ratings={classReview.ratings}
-                            overview={classReview.class_overview}
-                        />
-                    </div>
-                ))}
+                <InfiniteScroll
+                    dataLength={classReviews.length}
+                    next={fetchMoreClasses}
+                    hasMore={hasMore}
+                    loader={<h4>Loading...</h4>}
+                >
+                    {classReviews.map(classReview => (
+                        <div key={classReview.id} className="p-4">
+                            <ClassCard
+                                id={classReview.id}
+                                className={classReview.class_name}
+                                ratings={classReview.ratings}
+                                overview={classReview.class_overview}
+                            />
+                        </div>
+                    ))}
+                </InfiniteScroll>
             </div>
         </div>
     );

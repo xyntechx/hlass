@@ -30,3 +30,24 @@ export const ratingHelpText = {
     professor: { low: "Unsatisfactory", high: "Outstanding" },
     content: { low: "Irrelevant", high: "Valuable" },
 };
+
+export const unitOptions = [
+    { value: '0.5', label: '0.5' },
+    { value: '1.0', label: '1.0' },
+    { value: '2.0', label: '2.0' },
+    { value: '3.0', label: '3.0' },
+    { value: '4.0', label: '4.0' },
+    { value: '5.0', label: '5.0' }
+];
+
+export const classLevelOptions = [
+    { value: 'Lower Division', label: 'Lower Division' },
+    { value: 'Upper Division', label: 'Upper Division' },
+    { value: 'Graduate', label: 'Graduate' }
+];
+export const sortOptions = [
+    { value: 'Overall', label: 'Sort by: Overall' },
+    { value: 'Difficulty', label: 'Sort by: Difficulty' },
+    { value: 'Professor', label: 'Sort by: Professor' },
+    { value: 'Content', label: 'Sort by: Content' }
+];

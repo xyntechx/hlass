@@ -14,6 +14,7 @@ import {
     ratingHelpText,
 } from "@/lib/options";
 import Alert from "@/components/alert";
+import { useFetchClasses } from "@/lib/supabase/fetch-classes";
 
 type OptionType = {
     value: string;
@@ -24,8 +25,8 @@ const ReviewForm = () => {
     const user = useSession()?.user;
     const supabase = createSupabaseBrowserClient();
     const router = useRouter();
-
-    const [classOptions, setClassOptions] = useState<OptionType[]>([]);
+    
+    const classOptions = useFetchClasses();
     const [selectedClass, setSelectedClass] = useState<OptionType | null>(null);
     const [semesters, setSemesters] = useState<OptionType[]>([]);
     const [selectedSemester, setSelectedSemester] = useState<OptionType | null>(
@@ -42,28 +43,6 @@ const ReviewForm = () => {
     );
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchClasses = async () => {
-            let { data, error } = await supabase
-                .from("classes")
-                .select("id, class_name");
-
-            if (error) {
-                return;
-            }
-
-            if (data) {
-                const options: OptionType[] = data.map((c) => ({
-                    value: c.id,
-                    label: c.class_name,
-                }));
-                setClassOptions(options);
-            }
-        };
-
-        fetchClasses();
-    }, [supabase]);
-
     const handleClassChange = (selectedOption: OptionType | null) => {
         setSelectedClass(selectedOption);
         setSelectedSemester(null);
@@ -76,7 +55,8 @@ const ReviewForm = () => {
             if (selectedClass) {
                 let { data, error } = await supabase
                     .from("class_instances")
-                    .select("id, semester, professors");
+                    .select("id, semester, professors")
+                    .filter('class_id', 'eq', selectedClass.value);
 
                 if (error) {
                     return;

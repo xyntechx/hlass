@@ -273,7 +273,7 @@ const ClassReviewPage = () => {
             <div className="ml-1/3 w-2/3">
                 {" "}
                 {/* Review Cards Container */}
-                <div className="flex max-w-3xl items-center justify-between pl-4">
+                <div className="flex w-full items-center justify-between px-4">
                     <span>{classCount} Results</span>
                     <div className="flex flex-row gap-x-2">
                         <SortButton
@@ -307,7 +307,7 @@ const ClassReviewPage = () => {
                         <div key={classReview.id} className="p-4">
                             <ClassCard
                                 id={classReview.id}
-                                className={classReview.class_name}
+                                name={classReview.class_name}
                                 ratings={classReview.ratings}
                                 overview={classReview.class_overview}
                             />

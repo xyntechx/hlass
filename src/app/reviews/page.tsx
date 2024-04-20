@@ -185,7 +185,6 @@ const ClassReviewPage = () => {
     return (
         <div className="flex w-screen flex-row gap-x-16 p-10">
             <div className="fixed flex w-1/3 justify-end pr-16">
-                {" "}
                 {/* Sidebar Filter */}
                 <div className="max-h-sm w-full max-w-sm rounded-xl border border-gray-200 bg-white p-4 shadow-lg">
                     <div className="flex flex-row justify-between">
@@ -290,6 +289,12 @@ const ClassReviewPage = () => {
                             onChange={handleSortBy}
                             options={sortOptions}
                         />
+                        <a
+                            href="/reviews/submit"
+                            className="rounded-md border-2 border-primary-blue bg-primary-blue px-4 py-1 text-white transition-shadow hover:shadow-lg"
+                        >
+                            + Review
+                        </a>
                     </div>
                 </div>
                 <InfiniteScroll

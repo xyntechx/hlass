@@ -1,18 +1,14 @@
-'use client';
+"use client";
 
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import Select, { MultiValue, SingleValue } from 'react-select';
-import Image from 'next/image';
-import ClassCard from '@/components/class-review/class-card';
-import {
-    unitOptions,
-    classLevelOptions,
-    sortOptions,
-} from '@/lib/options';
-import { createSupabaseBrowserClient } from '@/lib/supabase/browser-client';
-import { useFetchClasses } from '@/lib/supabase/fetch-classes';
-import SortButton from '@/components/buttons/sort';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
+import Select, { MultiValue, SingleValue } from "react-select";
+import Image from "next/image";
+import ClassCard from "@/components/class-review/class-card";
+import { unitOptions, classLevelOptions, sortOptions } from "@/lib/options";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
+import { useFetchClasses } from "@/lib/supabase/fetch-classes";
+import SortButton from "@/components/buttons/sort";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface Rating {
     name: string;
@@ -38,13 +34,22 @@ const supabase = createSupabaseBrowserClient();
 
 const ClassReviewPage = () => {
     const classOptions = useFetchClasses();
-    const [sortBy, setSortBy] = useState<SingleValue<OptionType>>({ value: 'Overall', label: 'Sort by: Overall' });
-    const [sortOrder, setSortOrder] = useState('desc');
+    const [sortBy, setSortBy] = useState<SingleValue<OptionType>>({
+        value: "Overall",
+        label: "Sort by: Overall",
+    });
+    const [sortOrder, setSortOrder] = useState("desc");
     const [classReviews, setClassReviews] = useState<Class[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedPrerequisites, setSelectedPrerequisites] = useState<MultiValue<OptionType>>([]);
-    const [selectedUnits, setSelectedUnits] = useState<MultiValue<OptionType>>([]);
-    const [selectedClassLevel, setSelectedClassLevel] = useState<MultiValue<OptionType>>([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedPrerequisites, setSelectedPrerequisites] = useState<
+        MultiValue<OptionType>
+    >([]);
+    const [selectedUnits, setSelectedUnits] = useState<MultiValue<OptionType>>(
+        [],
+    );
+    const [selectedClassLevel, setSelectedClassLevel] = useState<
+        MultiValue<OptionType>
+    >([]);
     const [classCount, setClassCount] = useState(0);
     const [pageIndex, setPageIndex] = useState(0);
     const [hasMore, setHasMore] = useState(true);
@@ -64,81 +69,84 @@ const ClassReviewPage = () => {
 
     const handleSortBy = (selectedOption: SingleValue<OptionType>) => {
         if (selectedOption === null) {
-            setSortBy({ value: 'overall', label: 'Overall' });
+            setSortBy({ value: "overall", label: "Overall" });
         } else {
             setSortBy(selectedOption);
         }
-    }
+    };
 
     const clearAllFilters = () => {
         setClassReviews([]);
-        setSearchQuery('');
+        setSearchQuery("");
         setSelectedPrerequisites([]);
         setSelectedUnits([]);
         setSelectedClassLevel([]);
     };
 
-    const fetchClasses = useCallback(async (index: number) => {
+    const fetchClasses = useCallback(
+        async (index: number) => {
+            let query = supabase
+                .from("classes")
+                .select("*", { count: "exact" })
+                .range(index * 10, (index + 1) * 10 - 1);
 
-        let query = supabase
-            .from('classes')
-            .select('*', { count: 'exact'})
-            .range(index * 10, (index + 1) * 10 - 1);
+            if (searchQuery) {
+                query = query.ilike("class_name", `%${searchQuery}%`);
+            }
 
-        if (searchQuery) {
-            query = query.ilike('class_name', `%${searchQuery}%`);
-        }
-        
-        if (selectedPrerequisites.length > 0) {
-            const prerequisiteIds = `{${selectedPrerequisites.map(pr => pr.value).join(',')}}`;
-            query = query.filter('prerequisites', 'cs', prerequisiteIds);
-        }
+            if (selectedPrerequisites.length > 0) {
+                const prerequisiteIds = `{${selectedPrerequisites.map((pr) => pr.value).join(",")}}`;
+                query = query.filter("prerequisites", "cs", prerequisiteIds);
+            }
 
-        if (selectedUnits.length > 0) {
-            const unitsValues = selectedUnits.map(u => u.value);
-            query = query.in('units', unitsValues);
-        }
+            if (selectedUnits.length > 0) {
+                const unitsValues = selectedUnits.map((u) => u.value);
+                query = query.in("units", unitsValues);
+            }
 
-        if (selectedClassLevel.length > 0) {
-            const classLevelValues = selectedClassLevel.map(cl => cl.value);
-            query = query.in('class_level', classLevelValues);
-        }
+            if (selectedClassLevel.length > 0) {
+                const classLevelValues = selectedClassLevel.map(
+                    (cl) => cl.value,
+                );
+                query = query.in("class_level", classLevelValues);
+            }
 
-        const { data, count, error } = await query;
+            const { data, count, error } = await query;
 
-        if (count) {
-            setClassCount(count);
-        }
+            if (count) {
+                setClassCount(count);
+            }
 
-        if (error) {
-            console.error('Error fetching data:', error);
-            return;
-        }
+            if (error) {
+                console.error("Error fetching data:", error);
+                return;
+            }
 
-        const transformedData = data.map(d => ({
-            id: d.id,
-            class_name: d.class_name,
-            class_overview: d.class_overview,
-            prerequisites: d.prerequisites,
-            units: d.units,
-            class_level: d.class_level,
-            ratings: [
-                { name: "Overall", value: d.avg_rating_overall },
-                { name: "Difficulty", value: d.avg_rating_difficulty },
-                { name: "Professor", value: d.avg_rating_professor },
-                { name: "Content", value: d.avg_content_rating },
-            ]
-        }));
+            const transformedData = data.map((d) => ({
+                id: d.id,
+                class_name: d.class_name,
+                class_overview: d.class_overview,
+                prerequisites: d.prerequisites,
+                units: d.units,
+                class_level: d.class_level,
+                ratings: [
+                    { name: "Overall", value: d.avg_rating_overall },
+                    { name: "Difficulty", value: d.avg_rating_difficulty },
+                    { name: "Professor", value: d.avg_rating_professor },
+                    { name: "Content", value: d.avg_content_rating },
+                ],
+            }));
 
-        if (index === 0) {
-            setClassReviews(transformedData);
-        } else {
-            setClassReviews(prev => [...prev, ...transformedData]);
-        }
-        setPageIndex(index);
-        setHasMore(data.length === 10);
-        
-    }, [searchQuery, selectedClassLevel, selectedPrerequisites, selectedUnits]);
+            if (index === 0) {
+                setClassReviews(transformedData);
+            } else {
+                setClassReviews((prev) => [...prev, ...transformedData]);
+            }
+            setPageIndex(index);
+            setHasMore(data.length === 10);
+        },
+        [searchQuery, selectedClassLevel, selectedPrerequisites, selectedUnits],
+    );
 
     const resetAndFetchClasses = useCallback(() => {
         setPageIndex(0);
@@ -152,7 +160,7 @@ const ClassReviewPage = () => {
     }, [fetchClasses, pageIndex]);
 
     useEffect(() => {
-        resetAndFetchClasses(); 
+        resetAndFetchClasses();
     }, [resetAndFetchClasses]);
 
     useEffect(() => {
@@ -160,42 +168,63 @@ const ClassReviewPage = () => {
 
         const sortedReviews = [...classReviews].sort((a, b) => {
             // Dynamically fetch the rating values from the ratings array
-            const valueA = a.ratings.find(r => r.name == sortBy.value)?.value ?? 0;
-            const valueB = b.ratings.find(r => r.name == sortBy.value)?.value ?? 0;
+            const valueA =
+                a.ratings.find((r) => r.name == sortBy.value)?.value ?? 0;
+            const valueB =
+                b.ratings.find((r) => r.name == sortBy.value)?.value ?? 0;
 
             // Sorting logic remains the same
-            return sortOrder === 'asc' ? valueA - valueB : valueB - valueA;
+            return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
         });
 
         // Use a function in setState to guarantee the new state is set
-        console.log(sortedReviews)
+        console.log(sortedReviews);
         setClassReviews(() => sortedReviews);
     }, [sortBy, sortOrder]);
 
-
     return (
-        <div className="flex flex-row p-10 gap-x-16 w-screen">
-            <div className="w-1/3 flex justify-end fixed pr-16"> {/* Sidebar Filter */}
-                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-lg max-w-sm max-h-sm">
+        <div className="flex w-screen flex-row gap-x-16 p-10">
+            <div className="fixed flex w-1/3 justify-end pr-16">
+                {/* Sidebar Filter */}
+                <div className="max-h-sm w-full max-w-sm rounded-xl border border-gray-200 bg-white p-4 shadow-lg">
                     <div className="flex flex-row justify-between">
-                        <h2 className="font-bold text-lg mb-4">Filter</h2>
-                        <button onClick={clearAllFilters} className="text-secondary-blue hover:text-primary-blue mb-4">Clear</button>
+                        <h2 className="mb-4 text-lg font-bold">Filter</h2>
+                        <button
+                            onClick={clearAllFilters}
+                            className="mb-4 text-secondary-blue hover:text-primary-blue"
+                        >
+                            Clear
+                        </button>
                     </div>
                     <div className="flex flex-col justify-evenly">
                         <div className="relative flex items-center pb-4">
-                            <div style={{ position: 'absolute', marginLeft: '10px', height: '20px', width: '20px' }}>
-                                <Image src="/search_icon.png" alt="Search Icon" width={20} height={20} />
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    marginLeft: "10px",
+                                    height: "20px",
+                                    width: "20px",
+                                }}
+                            >
+                                <Image
+                                    src="/search_icon.png"
+                                    alt="Search Icon"
+                                    width={20}
+                                    height={20}
+                                />
                             </div>
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={handleInputChange}
                                 placeholder="Search for a Class..."
-                                className="pl-10 pr-3 py-2 w-full border border-slate-300 rounded focus:outline-blue-500 focus:outline-2 focus:border-blue-500"
+                                className="w-full rounded border border-slate-300 py-2 pl-10 pr-3 focus:border-blue-500 focus:outline-2 focus:outline-blue-500"
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-bold text-gray-700 pb-2">Prerequisites</label>
+                            <label className="block pb-2 text-sm font-bold text-gray-700">
+                                Prerequisites
+                            </label>
                             <Select
                                 isMulti
                                 name="prerequisites"
@@ -208,7 +237,9 @@ const ClassReviewPage = () => {
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-bold text-gray-700 pb-2">Units</label>
+                            <label className="block pb-2 text-sm font-bold text-gray-700">
+                                Units
+                            </label>
                             <Select
                                 isMulti
                                 name="units"
@@ -221,7 +252,9 @@ const ClassReviewPage = () => {
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-bold text-gray-700 pb-2">Class Level</label>
+                            <label className="block pb-2 text-sm font-bold text-gray-700">
+                                Class Level
+                            </label>
                             <Select
                                 isMulti
                                 name="class-level"
@@ -237,19 +270,31 @@ const ClassReviewPage = () => {
                 </div>
             </div>
 
-            <div className="w-2/3 ml-1/3"> {/* Review Cards Container */}
-                <div className="flex justify-between items-center pl-4 max-w-3xl">
+            <div className="ml-1/3 w-2/3">
+                {" "}
+                {/* Review Cards Container */}
+                <div className="flex max-w-3xl items-center justify-between pl-4">
                     <span>{classCount} Results</span>
-                    <div className='flex flex-row gap-x-2'>
-                        <SortButton 
-                            sortOrder={sortOrder} 
-                            onToggle={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    <div className="flex flex-row gap-x-2">
+                        <SortButton
+                            sortOrder={sortOrder}
+                            onToggle={() =>
+                                setSortOrder(
+                                    sortOrder === "asc" ? "desc" : "asc",
+                                )
+                            }
                         />
                         <Select
                             value={sortBy}
                             onChange={handleSortBy}
                             options={sortOptions}
                         />
+                        <a
+                            href="/reviews/submit"
+                            className="rounded-md border-2 border-primary-blue bg-primary-blue px-4 py-1 text-white transition-shadow hover:shadow-lg"
+                        >
+                            + Review
+                        </a>
                     </div>
                 </div>
                 <InfiniteScroll
@@ -258,7 +303,7 @@ const ClassReviewPage = () => {
                     hasMore={hasMore}
                     loader={<h4>Loading...</h4>}
                 >
-                    {classReviews.map(classReview => (
+                    {classReviews.map((classReview) => (
                         <div key={classReview.id} className="p-4">
                             <ClassCard
                                 id={classReview.id}

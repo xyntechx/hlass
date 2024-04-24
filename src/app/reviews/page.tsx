@@ -6,6 +6,7 @@ import Image from "next/image";
 import ClassCard from "@/components/class-review/class-card";
 import { unitOptions, classLevelOptions, sortOptions } from "@/lib/options";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
+import useSession from "@/lib/supabase/use-session";
 import { useFetchClasses } from "@/lib/supabase/fetch-classes";
 import SortButton from "@/components/buttons/sort";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -33,6 +34,9 @@ type OptionType = {
 const supabase = createSupabaseBrowserClient();
 
 const ClassReviewPage = () => {
+    const user = useSession()?.user;
+    const [bookmarkedClassIDs, setBookmarkedClassIDs] = useState<string[]>([]);
+
     const classOptions = useFetchClasses();
     const [sortBy, setSortBy] = useState<SingleValue<OptionType>>({
         value: "Overall",
@@ -182,6 +186,42 @@ const ClassReviewPage = () => {
         setClassReviews(() => sortedReviews);
     }, [sortBy, sortOrder]);
 
+    useEffect(() => {
+        const getBookmarkedClasses = async () => {
+            const { data, error } = await supabase
+                .from("profiles")
+                .select("bookmarked_class_ids")
+                .eq("id", user!.id);
+
+            if (!error) {
+                setBookmarkedClassIDs(
+                    data[0].bookmarked_class_ids
+                        ? data[0].bookmarked_class_ids
+                        : [],
+                );
+            }
+        };
+
+        if (user) getBookmarkedClasses();
+    }, [user]);
+
+    const handleBookmark = async (classID: string) => {
+        let newBookmarks = [];
+
+        if (bookmarkedClassIDs.includes(classID)) {
+            newBookmarks = bookmarkedClassIDs.filter((c) => c !== classID);
+        } else {
+            newBookmarks = [...bookmarkedClassIDs, classID];
+        }
+
+        const { data, error } = await supabase
+            .from("profiles")
+            .update({ bookmarked_class_ids: newBookmarks })
+            .eq("id", user!.id);
+
+        setBookmarkedClassIDs(newBookmarks);
+    };
+
     return (
         <div className="flex w-screen flex-row gap-x-16 p-10">
             <div className="fixed flex w-1/3 justify-end pr-16">
@@ -273,7 +313,7 @@ const ClassReviewPage = () => {
             <div className="ml-1/3 w-2/3">
                 {" "}
                 {/* Review Cards Container */}
-                <div className="flex max-w-3xl items-center justify-between pl-4">
+                <div className="flex w-full items-center justify-between px-4">
                     <span>{classCount} Results</span>
                     <div className="flex flex-row gap-x-2">
                         <SortButton
@@ -307,9 +347,29 @@ const ClassReviewPage = () => {
                         <div key={classReview.id} className="p-4">
                             <ClassCard
                                 id={classReview.id}
-                                className={classReview.class_name}
+                                name={classReview.class_name}
                                 ratings={classReview.ratings}
                                 overview={classReview.class_overview}
+                                linkComponent={
+                                    <button
+                                        onClick={() =>
+                                            handleBookmark(classReview.id)
+                                        }
+                                    >
+                                        <Image
+                                            src={
+                                                bookmarkedClassIDs.includes(
+                                                    classReview.id,
+                                                )
+                                                    ? "/bookmark-full.svg"
+                                                    : "/bookmark-empty.svg"
+                                            }
+                                            alt="View Review"
+                                            width={30}
+                                            height={30}
+                                        />
+                                    </button>
+                                }
                             />
                         </div>
                     ))}

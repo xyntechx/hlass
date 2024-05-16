@@ -10,6 +10,8 @@ import useSession from "@/lib/supabase/use-session";
 import { useFetchClasses } from "@/lib/supabase/fetch-classes";
 import SortButton from "@/components/buttons/sort";
 import InfiniteScroll from "react-infinite-scroll-component";
+import Popup from "@/components/popup";
+import { useRouter } from "next/navigation";
 
 interface Rating {
     name: string;
@@ -34,6 +36,25 @@ type OptionType = {
 const supabase = createSupabaseBrowserClient();
 
 const ClassReviewPage = () => {
+    const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+    const [showPopup, setShowPopup] = useState(false);
+    const router = useRouter();
+
+    const handleClassClick = (classData: Class) => {
+        setSelectedClass(classData);
+        setShowPopup(true);
+    };
+
+    const handlePopupClose = () => {
+        setShowPopup(false);
+        setSelectedClass(null);
+    };
+
+    const handleViewClass = () => {
+        if (selectedClass) {
+            router.push(`/reviews/class?id=${selectedClass.id}`);
+        }
+    };
     const user = useSession()?.user;
     const [bookmarkedClassIDs, setBookmarkedClassIDs] = useState<string[]>([]);
 
@@ -370,11 +391,22 @@ const ClassReviewPage = () => {
                                         />
                                     </button>
                                 }
+                                onClick={() => handleClassClick(classReview)}
                             />
                         </div>
                     ))}
                 </InfiniteScroll>
             </div>
+            <Popup show={showPopup} onClose={handlePopupClose} onViewClass={handleViewClass}>
+                {selectedClass && (
+                <div>
+                    <h2 className="text-2xl font-bold mb-4">
+                    {selectedClass.class_name}
+                    </h2>
+                    <p className="mb-4">{selectedClass.class_overview}</p>
+                </div>
+                )}
+            </Popup>
         </div>
     );
 };

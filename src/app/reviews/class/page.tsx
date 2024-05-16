@@ -35,9 +35,7 @@ const ClassDetails = () => {
                 .eq('id', classId)
                 .single();
 
-            if (error) {
-                console.error('Error fetching class data:', error);
-            } else {
+            if (!error) {
                 const classData = data as Class;
                 setSelectedClass(classData);
             }

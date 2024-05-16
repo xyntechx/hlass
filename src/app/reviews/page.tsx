@@ -121,7 +121,6 @@ const ClassReviewPage = () => {
 
             if (selectedPrerequisites.length > 0) {
                 const prerequisiteIds = selectedPrerequisites.map((pr) => pr.value);
-                console.log("Prerequisite IDs:", prerequisiteIds);
                 query = query.overlaps("prerequisites", prerequisiteIds);
             }
 
@@ -144,7 +143,6 @@ const ClassReviewPage = () => {
             }
 
             if (error) {
-                console.error("Error fetching data:", error);
                 return;
             }
 
@@ -204,7 +202,6 @@ const ClassReviewPage = () => {
         });
 
         // Use a function in setState to guarantee the new state is set
-        console.log(sortedReviews);
         setClassReviews(() => sortedReviews);
     }, [sortBy, sortOrder]);
 

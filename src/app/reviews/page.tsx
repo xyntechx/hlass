@@ -120,8 +120,13 @@ const ClassReviewPage = () => {
             }
 
             if (selectedPrerequisites.length > 0) {
-                const prerequisiteIds = `{${selectedPrerequisites.map((pr) => pr.value).join(",")}}`;
-                query = query.filter("prerequisites", "cs", prerequisiteIds);
+                const prerequisiteIds = selectedPrerequisites.map((pr) => pr.value);
+                console.log("Prerequisite IDs:", prerequisiteIds);
+                query = query.overlaps("prerequisites", prerequisiteIds);
+
+
+                /* const prerequisiteIds = `{${selectedPrerequisites.map((pr) => pr.value).join(",")}}`;
+                query = query.filter("prerequisites", "cs", prerequisiteIds); */
             }
 
             if (selectedUnits.length > 0) {
@@ -138,7 +143,7 @@ const ClassReviewPage = () => {
 
             const { data, count, error } = await query;
 
-            if (count) {
+            if (count !== null) {
                 setClassCount(count);
             }
 

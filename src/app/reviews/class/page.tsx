@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import { useFetchClasses } from '@/lib/supabase/fetch-classes';
@@ -22,12 +22,10 @@ interface Rating {
 
 const supabase = createSupabaseBrowserClient();
 
-const ReviewPage = () => {
+const ClassDetails = () => {
+    const [selectedClass, setSelectedClass] = useState<Class | null>(null);
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
-    const [selectedClass, setselectedClass] = useState<Class | null>(null);
-    const [selectedClassId, setSelectedClassId] = useState<string | null>(id as string);
-    const classOptions = useFetchClasses();
 
     useEffect(() => {
         const fetchClassData = async (classId: string) => {
@@ -41,23 +39,32 @@ const ReviewPage = () => {
                 console.error('Error fetching class data:', error);
             } else {
                 const classData = data as Class;
-                setselectedClass(classData);
+                setSelectedClass(classData);
             }
         };
 
-        if (selectedClassId) {
-            fetchClassData(selectedClassId);
+        if (id) {
+            fetchClassData(id);
         }
-    }, [selectedClassId]);
+    }, [id]);
 
     if (!selectedClass) {
         return <div>Loading...</div>;
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div>
             <h1 className="text-3xl font-bold">{selectedClass.class_name}</h1>
+            {/* TODO: Add other class details here */}
         </div>
+    );
+};
+
+const ReviewPage = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ClassDetails/>
+        </Suspense>
     );
 };
 

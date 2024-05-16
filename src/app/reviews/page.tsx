@@ -123,10 +123,6 @@ const ClassReviewPage = () => {
                 const prerequisiteIds = selectedPrerequisites.map((pr) => pr.value);
                 console.log("Prerequisite IDs:", prerequisiteIds);
                 query = query.overlaps("prerequisites", prerequisiteIds);
-
-
-                /* const prerequisiteIds = `{${selectedPrerequisites.map((pr) => pr.value).join(",")}}`;
-                query = query.filter("prerequisites", "cs", prerequisiteIds); */
             }
 
             if (selectedUnits.length > 0) {

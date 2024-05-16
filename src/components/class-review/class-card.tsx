@@ -25,7 +25,7 @@ const ClassCard = ({
 }: ClassCardProps) => {
     return (
         <div 
-            className="relative flex w-full flex-col items-center justify-center gap-y-8 rounded-lg border border-gray-200 bg-white p-10 shadow-lg hover:bg-gray-50 hover:border-2 hover:border-secondary-blue hover:shadow-xl transition-colors duration-100"
+            className="relative flex w-full flex-col items-center justify-center gap-y-8 rounded-lg outline outline-1 outline-gray-200 bg-white p-10 shadow-lg hover:bg-gray-50 hover:outline-2 hover:outline-secondary-blue hover:shadow-xl transition-colors duration-100"
             onClick={onClick}  
         >
             <div className="absolute right-[20px] top-[20px]">

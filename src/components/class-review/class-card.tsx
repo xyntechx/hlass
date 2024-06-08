@@ -1,6 +1,6 @@
 import RatingBox from "@/components/class-review/rating-box";
 import clsx from "clsx";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 
 interface Rating {
     name: string;

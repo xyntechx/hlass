@@ -29,7 +29,7 @@ const ClassCard = ({
             className={clsx(
                 "relative flex w-full flex-col items-center justify-center gap-y-8 rounded-lg bg-white p-10 shadow-lg outline outline-1 outline-gray-200",
                 {
-                    "transition-colors duration-100 hover:bg-gray-50 hover:outline-2 hover:outline-secondary-blue":
+                    "cursor-pointer transition-colors duration-100 hover:bg-gray-50 hover:outline-2 hover:outline-secondary-blue":
                         onClick,
                 },
             )}

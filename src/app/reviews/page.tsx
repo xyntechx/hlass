@@ -120,7 +120,9 @@ const ClassReviewPage = () => {
             }
 
             if (selectedPrerequisites.length > 0) {
-                const prerequisiteIds = selectedPrerequisites.map((pr) => pr.value);
+                const prerequisiteIds = selectedPrerequisites.map(
+                    (pr) => pr.value,
+                );
                 query = query.overlaps("prerequisites", prerequisiteIds);
             }
 
@@ -395,14 +397,18 @@ const ClassReviewPage = () => {
                     ))}
                 </InfiniteScroll>
             </div>
-            <Popup show={showPopup} onClose={handlePopupClose} onViewClass={handleViewClass}>
+            <Popup
+                show={showPopup}
+                onClose={handlePopupClose}
+                onViewClass={handleViewClass}
+            >
                 {selectedClass && (
-                <div>
-                    <h2 className="text-2xl font-bold mb-4">
-                    {selectedClass.class_name}
-                    </h2>
-                    <p className="mb-4">{selectedClass.class_overview}</p>
-                </div>
+                    <div>
+                        <h2 className="mb-4 text-2xl font-bold">
+                            {selectedClass.class_name}
+                        </h2>
+                        <p className="mb-4">{selectedClass.class_overview}</p>
+                    </div>
                 )}
             </Popup>
         </div>

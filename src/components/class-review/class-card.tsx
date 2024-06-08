@@ -2,7 +2,6 @@ import RatingBox from "@/components/class-review/rating-box";
 import clsx from "clsx";
 import { ReactNode, useState } from "react";
 
-
 interface Rating {
     name: string;
     value: number;
@@ -23,20 +22,23 @@ const ClassCard = ({
     ratings,
     overview,
     linkComponent,
-    onClick, 
+    onClick,
 }: ClassCardProps) => {
-
     return (
-        <div 
+        <div
             className={clsx(
-                'relative flex w-full flex-col items-center justify-center gap-y-8 rounded-lg outline outline-1 outline-gray-200 bg-white p-10 shadow-lg',
+                "relative flex w-full flex-col items-center justify-center gap-y-8 rounded-lg bg-white p-10 shadow-lg outline outline-1 outline-gray-200",
                 {
-                    'hover:bg-gray-50 hover:outline-2 hover:outline-secondary-blue transition-colors duration-100': onClick,
-                }
+                    "transition-colors duration-100 hover:bg-gray-50 hover:outline-2 hover:outline-secondary-blue":
+                        onClick,
+                },
             )}
-            onClick={onClick}  
+            onClick={onClick}
         >
-            <div className="absolute right-[20px] top-[20px]">
+            <div
+                onClick={(e: any) => e.stopPropagation()}
+                className="absolute right-[20px] top-[20px]"
+            >
                 {linkComponent}
             </div>
             <h2 className="text-center text-3xl font-bold">{name}</h2>
